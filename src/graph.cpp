@@ -49,8 +49,10 @@ public:
         
         file >> V; // Lê o número de vértices do grafo do arquivo.
         adjList.resize(V + 1);
-        adjMatrix.resize(V + 1, vector<int>(V + 1, 0));
-
+        if (useAdjMatrix){
+            adjMatrix.resize(V + 1, vector<int>(V + 1, 0));
+        }
+        
         int u, v; 
         while (file >> u >> v) { //lê pares de inteiros (as arestas) do arquivo até o final do arquivo.
             addEdge(u, v);
