@@ -13,10 +13,10 @@ int main() {
     g.loadFromFile("C:/Users/kauag/Documents/GitHub/Teoria-dos-Grafos/data/grafo_4.txt"); //lendo o arquivo
 
     // Percorrer o grafo usando BFS e salvar as informações
-    g.bfs(1);
+    //g.bfs(1);
 
     // Percorrer o grafo usando DFS e salvar as informações
-    g.dfs(1);
+    //g.dfs(1);
 
     // Calcular as estatísticas de grau
     g.calculateDegreeStats();
