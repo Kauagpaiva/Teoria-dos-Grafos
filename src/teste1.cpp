@@ -10,7 +10,7 @@
 
 int main() {
     Graph g(0, false); // Inicializa com 0 vértices, pois serão lidos do arquivo, não utilizando matriz adjacencia
-    g.loadFromFile("C:/Users/kauag/Documents/GitHub/Teoria-dos-Grafos/data/grafo_2.txt"); //lendo o arquivo
+    g.loadFromFile("C:/Users/kauag/Documents/GitHub/Teoria-dos-Grafos/data/grafo_4.txt"); //lendo o arquivo
 
     // Percorrer o grafo usando BFS e salvar as informações
     g.bfs(1);
