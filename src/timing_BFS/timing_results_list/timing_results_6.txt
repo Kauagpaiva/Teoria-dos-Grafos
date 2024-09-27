@@ -1,0 +1,1 @@
+tempo medio: 1.45309e+06 microsegundos
