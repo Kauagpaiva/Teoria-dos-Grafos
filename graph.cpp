@@ -269,6 +269,11 @@ public:
     // Construtor
     WeightedGraph(int vertices) : numVertices(vertices), adjList(vertices) {}
 
+
+    int getVertices(){
+        return numVertices;
+    }
+    
     // Método para adicionar uma aresta com peso
     void addEdge(int v1, int v2, double weight) {
         adjList[v1].emplace_back(v2, weight);
