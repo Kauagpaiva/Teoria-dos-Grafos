@@ -2,6 +2,7 @@
 #include <vector>
 #include <fstream>
 #include <queue>
+#include <list>
 #include <algorithm>
 #include <limits>
 #include <cmath>
@@ -10,6 +11,7 @@
 #include <ctime>     // For time()
 #include <chrono>
 #include <stack>
+#include <map>
 
 using namespace std;
 
@@ -65,9 +67,6 @@ public:
 
     // BFS para percorrer o grafo, nó inicial como parâmetro
     void bfs(int start, vector<bool> &visited, vector<int> &parent, vector<int> &level) {
-        // vector<bool> visited(V + 1, false); // lista de nós visitados (O nó é representado como o indice da lista e o valor true ou false indica se foi visitado ou não)
-        // vector<int> parent(V + 1, -1); //lista dos pais
-        // vector<int> level(V + 1, -1); //lista dos niveis
 
         queue<int> q; // Fila
         visited[start] = true; //marca o nó inicial como visitado
@@ -257,6 +256,128 @@ private:
         int distance = *std::max_element(level2.begin(), level2.end());
 
         return distance;  // Retorna o maior nível encontrado pela segunda BFS
+    }
+};
+
+
+class WeightedGraph {
+private:
+    int numVertices;
+    vector<list<pair<int, double>>> adjList;  // Lista de adjacências com pesos (vértice, peso)
+
+public:
+    // Construtor
+    WeightedGraph(int vertices) : numVertices(vertices), adjList(vertices) {}
+
+    // Método para adicionar uma aresta com peso
+    void addEdge(int v1, int v2, double weight) {
+        adjList[v1].emplace_back(v2, weight);
+        adjList[v2].emplace_back(v1, weight);  // Grafo não direcionado
+    }
+
+    // Leitura do grafo a partir de um arquivo
+    void readGraphFromFile(const string& filename) {
+        ifstream file(filename);
+        if (!file.is_open()) {
+            cerr << "Erro ao abrir o arquivo!" << endl;
+            return;
+        }
+
+        int vertices;
+        file >> vertices;
+        numVertices = vertices;
+        adjList.resize(numVertices);
+
+        int v1, v2;
+        double weight;
+        while (file >> v1 >> v2 >> weight) {
+            addEdge(v1, v2, weight);
+        }
+
+        file.close();
+    }
+
+    // fuunção auxiliar para encontrar o nó com a menor distancia
+    int getNodeWithMinDist(const vector<double>& dist, const vector<bool>& visited) {
+        float minDistance = numeric_limits<float>::infinity();
+        int nodeWithMinDistance = -1;
+
+        for (int i = 0; i < numVertices; i++) {
+            if (!visited[i] && dist[i] <= minDistance) {
+                // cout << "Entrou" << endl;
+                minDistance = dist[i];
+                nodeWithMinDistance = i;
+            }
+        }
+        return nodeWithMinDistance;
+    }
+
+    // Algoritmo de Dijkstra sem heap
+    pair<vector<double>, vector<int>> dijkstra(int start) {
+        vector<double> dist(numVertices, numeric_limits<double>::infinity()); //iniciando todos os vertices com distancia infinita
+        vector<int> parent(numVertices, -1); // lista para registrar o pai de cada vertice
+        vector<bool> visited(numVertices, false);  // Conjunto de vértices explorados
+
+        dist[start] = 0.0;  // Distância para o vértice inicial é zero
+        parent[start] = 0; // Vertice inicial sem pai pois é a raiz
+
+        for (int i = 0; i < numVertices; i++) {
+            // Seleciona u em V-S tal que dist[u] é mínima
+            int u = getNodeWithMinDist(dist, visited);
+
+            visited[u] = true; //visita u
+
+            // Para cada vizinho v de u
+            for (const auto& neighbor : adjList[u]) {
+                int v = neighbor.first; // define o vizinho
+                double weight = neighbor.second; // define o peso da aresta ate esse vizinho
+
+                // Se dist[v] > dist[u] + w(u,v), atualiza dist[v]
+                if (dist[v] > dist[u] + weight) {
+                    dist[v] = dist[u] + weight;
+                    parent[v] = u;
+                }
+            }
+        }
+
+        // Retorna distâncias e pais
+        return {dist, parent};
+    }
+
+    // Algoritmo de Dijkstra usando heap (priority queue)
+    pair<vector<double>, vector<int>> dijkstraWithHeap(int start) {
+        vector<double> dist(numVertices, numeric_limits<double>::infinity()); // Inicializa distâncias
+        vector<int> parent(numVertices, -1); // Inicializa pais
+        dist[start] = 0.0;  // A distância do vértice inicial é zero
+
+        // Min-heap para armazenar (distância, vértice)
+        priority_queue<pair<double, int>, vector<pair<double, int>>, greater<>> minHeap;
+        minHeap.push({0.0, start});  // Começa com o vértice inicial
+
+        while (!minHeap.empty()) {
+            int u = minHeap.top().second;  // Vértice com menor distância
+            double currDist = minHeap.top().first;
+            minHeap.pop();
+
+            // Se a distância atual é maior que a registrada, ignore
+            if (currDist > dist[u]) continue;
+
+            // Para cada vizinho v de u
+            for (const auto& neighbor : adjList[u]) {
+                int v = neighbor.first;
+                double weight = neighbor.second;
+
+                // Relaxamento da aresta (u, v)
+                if (dist[v] > dist[u] + weight) {
+                    dist[v] = dist[u] + weight;
+                    parent[v] = u;
+                    minHeap.push({dist[v], v});
+                }
+            }
+        }
+
+        // Retorna as distâncias e os pais
+        return {dist, parent};
     }
 };
 
