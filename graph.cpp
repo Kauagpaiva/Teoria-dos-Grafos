@@ -263,6 +263,7 @@ private:
 class WeightedGraph {
 private:
     int numVertices;
+    bool hasNegativeEdge;
     vector<list<pair<int, double>>> adjList;  // Lista de adjacências com pesos (vértice, peso)
 
 public:
@@ -273,7 +274,7 @@ public:
     int getVertices(){
         return numVertices;
     }
-    
+
     // Método para adicionar uma aresta com peso
     void addEdge(int v1, int v2, double weight) {
         adjList[v1].emplace_back(v2, weight);
@@ -297,6 +298,9 @@ public:
         double weight;
         while (file >> v1 >> v2 >> weight) {
             addEdge(v1, v2, weight);
+            if (weight < 0){
+                hasNegativeEdge = true;
+            }
         }
 
         file.close();
@@ -319,6 +323,11 @@ public:
 
     // Algoritmo de Dijkstra sem heap
     pair<vector<double>, vector<int>> dijkstra(int start) {
+        if(hasNegativeEdge){
+            cout << "Grafo possui arestas com peso negativo. Nao e possivel calcular a distancia." << endl;
+            return;
+        }
+
         vector<double> dist(numVertices, numeric_limits<double>::infinity()); //iniciando todos os vertices com distancia infinita
         vector<int> parent(numVertices, -1); // lista para registrar o pai de cada vertice
         vector<bool> visited(numVertices, false);  // Conjunto de vértices explorados
@@ -351,6 +360,12 @@ public:
 
     // Algoritmo de Dijkstra usando heap (priority queue)
     pair<vector<double>, vector<int>> dijkstraWithHeap(int start) {
+        
+        if(hasNegativeEdge){
+            cout << "Grafo possui arestas com peso negativo. Nao e possivel calcular a distancia." << endl;
+            return;
+        }
+
         vector<double> dist(numVertices, numeric_limits<double>::infinity()); // Inicializa distâncias
         vector<int> parent(numVertices, -1); // Inicializa pais
         dist[start] = 0.0;  // A distância do vértice inicial é zero
