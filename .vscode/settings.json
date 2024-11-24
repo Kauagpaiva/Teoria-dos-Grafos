@@ -5,6 +5,9 @@
         "vector": "cpp",
         "limits": "cpp",
         "iostream": "cpp",
-        "list": "cpp"
-    }
+        "list": "cpp",
+        "xstring": "cpp",
+        "utility": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }
