@@ -42,7 +42,7 @@ class Aresta:
             self.capacity_residual = self.capacity - self.fluxo
             self.pointer_inversa.atualizar(bottleneck)
 
-class Graph:
+class Grafo:
     
     def __init__(self, arquivo:str, direcionado: bool = True):
         """
@@ -230,5 +230,5 @@ class Graph:
         arquivo.close()
         return tempo
 
-grafo = Graph("TP3/grafo_rf_1.txt", True)
+grafo = Grafo("TP3/grafo_rf_1.txt", True)
 print(grafo.ford_fulkerson(1,2,True,False))
