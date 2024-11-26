@@ -4,8 +4,15 @@ import time
 
 class Aresta:
     def __init__(self, vert_1: int, vert_2:int, capacity:int, fluxo:int, inversa:bool):
-        """A classe cria uma aresta que liga vert_1 e vert_2 que tem fluxo e capacidade"""
-
+        """
+        Inicializa os atributos da aresta.
+        :param vert_1: Vértice de origem
+        :param vert_2: Vértice de destino
+        :param capacidade: Capacidade da aresta
+        :param fluxo: Fluxo atual da aresta
+        :param inversa: Indica se a aresta é inversa (grafo residual)
+        """
+         
         self.vert_1 = int(vert_1)
         self.vert_2 = int(vert_2)
 
@@ -24,6 +31,10 @@ class Aresta:
             self.capacity_residual = self.capacity - self.fluxo
         
     def atualizar(self, bottleneck: int):
+        """
+        Atualiza o fluxo e a capacidade residual da aresta.
+        :param gargalo: Valor a ser incrementado no fluxo
+        """
         self.fluxo += bottleneck
         if self.inversa == True:
             self.capacity_residual = self.fluxo
@@ -31,10 +42,15 @@ class Aresta:
             self.capacity_residual = self.capacity - self.fluxo
             self.pointer_inversa.atualizar(bottleneck)
 
-class Lista_2:
+class Graph:
+    
     def __init__(self, arquivo:str, direcionado: bool = True):
+        """
+        Inicializa o grafo a partir de um arquivo.
+        :param arquivo: Caminho para o arquivo do grafo
+        :param direcionado: Indica se o grafo é direcionado
+        """
         self.arquivo = arquivo
-
         self.grafo = defaultdict(list) 
         arquivo = open(self.arquivo, 'r')
         self.tamanho = int(arquivo.readline())
@@ -63,6 +79,13 @@ class Lista_2:
         arquivo.close
 
     def bfs(self, inicio: int, fim: int, delta: int):
+        """
+        Realiza uma busca em largura (BFS) para encontrar um caminho viável no grafo residual.
+        :param inicio: Vértice inicial
+        :param fim: Vértice final
+        :param delta: Capacidade mínima residual para considerar um caminho
+        :return: Lista de pais que representa o caminho encontrado, ou False se não houver caminho
+        """
         iniciador = 1
         explorados = [0] * (self.tamanho + 1) 
         pais = [0] * (self.tamanho + 1) 
@@ -89,6 +112,13 @@ class Lista_2:
         return False
 
     def get_caminho(self, inicio: int, fim: int, delta: int = 1):
+        """
+        Obtém o caminho entre dois vértices usando BFS.
+        :param inicio: Vértice inicial
+        :param fim: Vértice final
+        :param delta: Capacidade mínima residual
+        :return: Lista de arestas no caminho ou False se não houver caminho
+        """
         pais = self.bfs(inicio, fim, delta)
         if pais:
             caminho = [pais[-1]]
@@ -108,12 +138,24 @@ class Lista_2:
         return bottleneck
 
     def aumentar(self, caminho: List[Aresta]):
+        """
+        Aumenta o fluxo ao longo de um caminho.
+        :param caminho: Lista de arestas no caminho
+        """
         bottleneck = self.get_bottleneck(caminho)
         bottleneck_valor = bottleneck.capacity_residual
         for aresta in caminho:
             aresta.atualizar(bottleneck_valor)
 
     def ford_fulkerson(self, inicio, fim, delta, imprimir):
+        """
+        Algoritmo de Ford-Fulkerson para cálculo de fluxo máximo.
+        :param inicio: Vértice inicial
+        :param fim: Vértice final
+        :param delta: Indica se o escalonamento delta será usado
+        :param imprimir: Nome do arquivo para salvar o grafo residual
+        :return: Valor do fluxo máximo ou tupla com fluxo e tempo de execução
+        """
         if delta == False:
             caminho = self.get_caminho(inicio, fim)
             while caminho:
@@ -144,6 +186,11 @@ class Lista_2:
             return fluxo, tempo_leitura
         
     def get_fluxo(self, vertice: int):
+        """
+        Calcula o fluxo total saindo de um vértice.
+        :param vertice: Vértice de origem
+        :return: Fluxo total
+        """
         fluxo = 0
         vizinhos = self.grafo[vertice]
         for aresta in vizinhos:
@@ -151,13 +198,23 @@ class Lista_2:
         return fluxo
 
     def get_capacity(self, vertice: int):
+        """
+        Calcula a capacidade total de saída de um vértice.
+        :param vertice: Vértice de origem
+        :return: Capacidade total
+        """
         capacity = 0
         vizinhos = self.grafo[vertice]
         for aresta in vizinhos:
             capacity += aresta.capacity
         return capacity
     
-    def imprimir(self, imprimir: str): #Cria o arquivo com o grafo residual
+    def imprimir(self, imprimir: str):
+        """
+        Salva o grafo residual em um arquivo e calcula o tempo de execução.
+        :param arquivo_saida: Nome do arquivo de saída
+        :return: Tempo de execução
+        """
         arquivo = open(imprimir, 'w')
         arquivo.writelines('aresta,vertice 1,vertice 2,fluxo\n')
         grafo = self.grafo
@@ -173,5 +230,5 @@ class Lista_2:
         arquivo.close()
         return tempo
 
-a=Lista_2("TP3/grafo_rf_1.txt", True)
-print(a.ford_fulkerson(1,2,True,False))
+grafo = Graph("TP3/grafo_rf_1.txt", True)
+print(grafo.ford_fulkerson(1,2,True,False))
